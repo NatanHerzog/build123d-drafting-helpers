@@ -1,7 +1,9 @@
 from build123d import *
 from math import *
-
-# HOLE CALLOUT COMPOUNDS
+from datetime import date
+from datetime import datetime
+import GDTHelpers
+# NEW DRAWING TEMPLATE
 # Designed By: Natan Herzog
 # Referenced From: https://build123d.readthedocs.io/en/latest/_modules/drafting.html#TechnicalDrawing
 
@@ -68,11 +70,11 @@ class Drawing(BaseSketchObject):
         if design_date is None:
             design_date = date.today()
 
-        page_dim = VTGDrawing.page_sizes[page_size]
+        page_dim = Drawing.page_sizes[page_size]
         
         
         #* Frame
-        frame_width = page_dim[0] - 2 * VTGDrawing.margin - 2 * nominal_text_size
+        frame_width = page_dim[0] - 2 * Drawing.margin - 2 * nominal_text_size
         frame_height = 2 * frame_width / 3
         frame_wire = Wire.make_polygon(
             [
@@ -252,7 +254,7 @@ class Drawing(BaseSketchObject):
         page_text = Text( txt = str(sheet_number) + " / " + str(sheet_count) , font_size = nominal_text_size , align = (Align.CENTER , Align.MIN) )
         page_text.position = row4_col4_box.center() + (0,-nominal_text_size,0)
 
-        projection = Pos(row4_col1_box.center()) * ThirdAngleProjection( feature_size = nominal_text_size*1.5 , line_width = 1 )
+        projection = Pos(row4_col1_box.center()) * GDTHelpers.ThirdAngleProjection( feature_size = nominal_text_size*1.5 , line_width = 1 )
 
 
         text_frame = trace( text_frame_curve , line_width , mode = Mode.PRIVATE )
@@ -273,3 +275,8 @@ class Drawing(BaseSketchObject):
         )
 
         super().__init__(obj=technical_drawing, rotation=0, align=None, mode=mode)
+
+if __name__ == "__main__":
+  from ocp_vscode import *
+
+  show( Drawing() , colors = ["#000"] )

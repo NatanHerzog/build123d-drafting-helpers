@@ -1,5 +1,7 @@
 from build123d import *
 from math import *
+from GDTHelpers import *
+
 
 # HOLE CALLOUT COMPOUNDS
 # Designed By: Natan Herzog
