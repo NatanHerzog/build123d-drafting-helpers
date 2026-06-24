@@ -211,6 +211,6 @@ if __name__ == "__main__":
       Pos( X = -2 , Y = -2 ) * Compound( a_vis_2["iso 4"] ),
     ]),
     colors = [
-      "#AAA" , "#AAA" , "#000",
+      "#CCC" , "#CCC" , "#000",
     ]
   )
