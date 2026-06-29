@@ -3,6 +3,8 @@ from math import *
 from datetime import date
 from datetime import datetime
 import GDTHelpers
+
+
 # NEW DRAWING TEMPLATE
 # Designed By: Natan Herzog
 # Referenced From: https://build123d.readthedocs.io/en/latest/_modules/drafting.html#TechnicalDrawing
@@ -61,12 +63,9 @@ class Drawing(BaseSketchObject):
         sheet_number: int = 1,
         sheet_count: int = 1,
         page_size: PageSize = PageSize.A2,
-        nominal_text_size: float = 10.0,
-        line_width: float = 1,
+        drafting_specs: Draft = Draft( font_size = 10 , line_width = 0.2 ),
         mode: Mode = Mode.ADD,
     ):
-        # pylint: disable=too-many-locals
-
         if design_date is None:
             design_date = date.today()
 
@@ -74,7 +73,7 @@ class Drawing(BaseSketchObject):
         
         
         #* Frame
-        frame_width = page_dim[0] - 2 * Drawing.margin - 2 * nominal_text_size
+        frame_width = page_dim[0] - 2 * Drawing.margin - 2 * drafting_specs.font_size
         frame_height = 2 * frame_width / 3
         frame_wire = Wire.make_polygon(
             [
@@ -84,7 +83,7 @@ class Drawing(BaseSketchObject):
                 (-frame_width / 2, -frame_height / 2),
             ],
         )
-        frame = trace(frame_wire, line_width, mode=Mode.PRIVATE)
+        frame = trace(frame_wire , drafting_specs.line_width , mode=Mode.PRIVATE)
         
         
         #* Ticks
@@ -98,22 +97,22 @@ class Drawing(BaseSketchObject):
                 Edge.make_line(
                     pos,
                     pos
-                    + Vector(nominal_text_size, 0).rotate(
+                    + Vector( drafting_specs.font_size , 0).rotate(
                         Axis.Z, frame_wire.tangent_angle_at(u_value) + 90
                     ),
                 )
             )
-        ticks = trace(tick_lines, line_width, mode=Mode.PRIVATE)
+        ticks = trace(tick_lines, drafting_specs.line_width, mode=Mode.PRIVATE)
         # Numbers
         grid_labels = Sketch()
         y_centers = {0: -3 / 8, 1: -1 / 8, 2: 1 / 8, 3: 3 / 8}
         for label in range(4):
             for x_index in [-0.5, 0.5]:
                 grid_labels += Pos(
-                    x_index * (frame_width + 1.25 * nominal_text_size),
+                    x_index * (frame_width + 1.25 * drafting_specs.font_size) ,
                     y_centers[label] * frame_height,
                 ) * Sketch(
-                    Compound.make_text(str(label + 1), nominal_text_size).wrapped
+                    Compound.make_text(str(label + 1), drafting_specs.font_size ).wrapped
                 )
 
         
@@ -131,8 +130,8 @@ class Drawing(BaseSketchObject):
             for y_index in [-0.5, 0.5]:
                 grid_labels += Pos(
                     x_centers[i] * frame_width,
-                    y_index * (frame_height + 1.25 * nominal_text_size),
-                ) * Sketch(Compound.make_text(grid_label, nominal_text_size).wrapped)
+                    y_index * (frame_height + 1.25 * drafting_specs.font_size),
+                ) * Sketch(Compound.make_text(grid_label, drafting_specs.font_size).wrapped)
 
         
         
@@ -148,21 +147,22 @@ class Drawing(BaseSketchObject):
         row_height = frame_height / 20
         text_box = Pos(frame.vertices().group_by(Axis.X)[-1].sort_by(Axis.Y)[0]) * Rectangle( width = frame_width/2 , height = frame_height/4 , align = (Align.MAX , Align.MIN) )
         
-        row1_col1_box = Pos(text_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[-1]) * Rectangle( width = frame_width/2/6 - line_width/2 , height = row_height , align = (Align.MIN , Align.MAX) )
+        row1_col1_box = Pos(text_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[-1]) * Rectangle( width = frame_width/2/6 - drafting_specs.line_width/2 , height = row_height , align = (Align.MIN , Align.MAX) )
         row1_col2_box = Pos(row1_col1_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/2*5/6 , height = row_height , align = (Align.MIN , Align.CENTER) )
         
-        row2_col1_box = Pos(row1_col1_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[0]) * Rectangle( width = frame_width/2/6 - line_width/2 , height = row_height , align = (Align.MIN , Align.MAX) )
+        row2_col1_box = Pos(row1_col1_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[0]) * Rectangle( width = frame_width/2/6 - drafting_specs.line_width/2 , height = row_height , align = (Align.MIN , Align.MAX) )
         row2_col2_box = Pos(row2_col1_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/2 - frame_width/2/6 - frame_width/9 , height = row_height , align = (Align.MIN , Align.CENTER) )
         row2_col3_box = Pos(row2_col2_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/9 , height = row_height , align = (Align.MIN , Align.CENTER) )
         
-        row3_col1_box = Pos(row2_col1_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[0]) * Rectangle( width = frame_width/2/6 - line_width/2 , height = row_height , align = (Align.MIN , Align.MAX) )
+        row3_col1_box = Pos(row2_col1_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[0]) * Rectangle( width = frame_width/2/6 - drafting_specs.line_width/2 , height = row_height , align = (Align.MIN , Align.MAX) )
         row3_col2_box = Pos(row3_col1_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/2 - frame_width/2/6 - frame_width/9 , height = row_height , align = (Align.MIN , Align.CENTER) )
         row3_col3_box = Pos(row3_col2_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/9 , height = row_height , align = (Align.MIN , Align.CENTER) )
         
-        row4_col1_box = Pos(row3_col1_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[0]) * Rectangle( width = frame_width/6 - line_width/2, height = 2*row_height , align = (Align.MIN , Align.MAX) )
-        row4_col2_box = Pos(row4_col1_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/9 , height = 2*row_height , align = (Align.MIN , Align.CENTER) )
-        row4_col3_box = Pos(row4_col2_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/9 , height = 2*row_height , align = (Align.MIN , Align.CENTER) )
-        row4_col4_box = Pos(row4_col3_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/9 , height = 2*row_height , align = (Align.MIN , Align.CENTER) )
+        row4_col1_box = Pos(row3_col1_box.vertices().group_by(Axis.X)[0].sort_by(Axis.Y)[0]) * Rectangle( width = frame_width/6 - drafting_specs.line_width/2, height = 2*row_height , align = (Align.MIN , Align.MAX) )
+        row4_col2_box = Pos(row4_col1_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/12 , height = 2*row_height , align = (Align.MIN , Align.CENTER) )
+        row4_col3_box = Pos(row4_col2_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/12 , height = 2*row_height , align = (Align.MIN , Align.CENTER) )
+        row4_col4_box = Pos(row4_col3_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/12 , height = 2*row_height , align = (Align.MIN , Align.CENTER) )
+        row4_col5_box = Pos(row4_col4_box.edges().sort_by(Axis.X)[-1].center()) * Rectangle( width = frame_width/12 , height = 2*row_height , align = (Align.MIN , Align.CENTER) )
 
 
         #* Text Box Edges
@@ -217,47 +217,55 @@ class Drawing(BaseSketchObject):
           row4_col3_box.vertices().group_by(Axis.X)[-1].sort_by(Axis.Y)[-1],
           row4_col3_box.vertices().group_by(Axis.X)[-1].sort_by(Axis.Y)[0]
         )
+        text_frame_curve += Edge.make_line(
+          row4_col4_box.vertices().group_by(Axis.X)[-1].sort_by(Axis.Y)[-1],
+          row4_col4_box.vertices().group_by(Axis.X)[-1].sort_by(Axis.Y)[0]
+        )
 
 
         #* Text Labels
-        project_label = Text( txt = "PROJECT" , font_size = nominal_text_size/1.5 , align = (Align.MAX , Align.CENTER) )
-        project_label.position = row1_col1_box.edges().sort_by(Axis.X)[-1].center() + (-nominal_text_size/2,0,0)
-        project_name_text = Text( txt = project_name , font_size = nominal_text_size , align = (Align.MIN , Align.CENTER) )
-        project_name_text.position = row1_col2_box.edges().sort_by(Axis.X)[0].center() + (nominal_text_size/2,0,0)
+        project_label = Text( txt = "PROJECT" , font_size = drafting_specs.font_size/1.5 , align = (Align.MAX , Align.CENTER) )
+        project_label.position = row1_col1_box.edges().sort_by(Axis.X)[-1].center() + (-drafting_specs.font_size/2,0,0)
+        project_name_text = Text( txt = project_name , font_size = drafting_specs.font_size , align = (Align.MIN , Align.CENTER) )
+        project_name_text.position = row1_col2_box.edges().sort_by(Axis.X)[0].center() + (drafting_specs.font_size/2,0,0)
         
-        part_label = Text( txt = "PART" , font_size = nominal_text_size/1.5 , align = (Align.MAX , Align.CENTER) )
-        part_label.position = row2_col1_box.edges().sort_by(Axis.X)[-1].center() + (-nominal_text_size/2,0,0)
-        part_name_text = Text( txt = part_name , font_size = nominal_text_size , align = (Align.MIN , Align.CENTER) )
-        part_name_text.position = row2_col2_box.edges().sort_by(Axis.X)[0].center() + (nominal_text_size/2,0,0)
-        part_number_text = Text( txt = drawing_number , font_size = nominal_text_size/1.5 , align = (Align.CENTER , Align.CENTER) )
+        part_label = Text( txt = "PART" , font_size = drafting_specs.font_size/1.5 , align = (Align.MAX , Align.CENTER) )
+        part_label.position = row2_col1_box.edges().sort_by(Axis.X)[-1].center() + (-drafting_specs.font_size/2,0,0)
+        part_name_text = Text( txt = part_name , font_size = drafting_specs.font_size , align = (Align.MIN , Align.CENTER) )
+        part_name_text.position = row2_col2_box.edges().sort_by(Axis.X)[0].center() + (drafting_specs.font_size/2,0,0)
+        part_number_text = Text( txt = drawing_number , font_size = drafting_specs.font_size/1.5 , align = (Align.CENTER , Align.CENTER) )
         part_number_text.position = row2_col3_box.center()
 
-        designed_label = Text( txt = "DESIGNED" , font_size = nominal_text_size/1.5 , align = (Align.MAX , Align.CENTER) )
-        designed_label.position = row3_col1_box.edges().sort_by(Axis.X)[-1].center() + (-nominal_text_size/2,0,0)
-        designed_text = Text( txt = designed_by , font_size = nominal_text_size/1.5 , align = (Align.MIN , Align.CENTER) )
-        designed_text.position = row3_col2_box.edges().sort_by(Axis.X)[0].center() + (nominal_text_size/2,0,0)
-        date_text = Text( txt = design_date.isoformat() , font_size = nominal_text_size/1.5 , align = (Align.CENTER , Align.CENTER) )
+        designed_label = Text( txt = "DESIGNED" , font_size = drafting_specs.font_size/1.5 , align = (Align.MAX , Align.CENTER) )
+        designed_label.position = row3_col1_box.edges().sort_by(Axis.X)[-1].center() + (-drafting_specs.font_size/2,0,0)
+        designed_text = Text( txt = designed_by , font_size = drafting_specs.font_size/1.5 , align = (Align.MIN , Align.CENTER) )
+        designed_text.position = row3_col2_box.edges().sort_by(Axis.X)[0].center() + (drafting_specs.font_size/2,0,0)
+        date_text = Text( txt = design_date.isoformat() , font_size = drafting_specs.font_size/1.5 , align = (Align.CENTER , Align.CENTER) )
         date_text.position = row3_col3_box.center()
 
-        scale_label = Text( txt = "SCALE" , font_size = nominal_text_size/1.5 , align = (Align.CENTER , Align.MIN) )
-        scale_label.position = row4_col2_box.center() + (0,nominal_text_size/1.5,0)
-        scale_text = Text( txt = "1 : " + str(drawing_scale)[0:4] , font_size = nominal_text_size , align = (Align.CENTER , Align.MIN) )
-        scale_text.position = row4_col2_box.center() + (0,-nominal_text_size,0)
+        scale_label = Text( txt = "SCALE" , font_size = drafting_specs.font_size/1.5 , align = (Align.CENTER , Align.MIN) )
+        scale_label.position = row4_col2_box.center() + (0,drafting_specs.font_size/1.5,0)
+        scale_text = Text( txt = "1 : " + str(drawing_scale)[0:4] , font_size = drafting_specs.font_size , align = (Align.CENTER , Align.MIN) )
+        scale_text.position = row4_col2_box.center() + (0,-drafting_specs.font_size,0)
         
-        units_label = Text( txt = "UNITS" , font_size = nominal_text_size/1.5 , align = (Align.CENTER , Align.MIN) )
-        units_label.position = row4_col3_box.center() + (0,nominal_text_size/1.5,0)
-        units_text = Text( txt = units , font_size = nominal_text_size , align = (Align.CENTER , Align.MIN) )
-        units_text.position = row4_col3_box.center() + (0,-nominal_text_size,0)
-        
-        page_label = Text( txt = "PAGE" , font_size = nominal_text_size/1.5 , align = (Align.CENTER , Align.MIN) )
-        page_label.position = row4_col4_box.center() + (0,nominal_text_size/1.5,0)
-        page_text = Text( txt = str(sheet_number) + " / " + str(sheet_count) , font_size = nominal_text_size , align = (Align.CENTER , Align.MIN) )
-        page_text.position = row4_col4_box.center() + (0,-nominal_text_size,0)
+        units_label = Text( txt = "UNITS" , font_size = drafting_specs.font_size/1.5 , align = (Align.CENTER , Align.MIN) )
+        units_label.position = row4_col3_box.center() + (0,drafting_specs.font_size/1.5,0)
+        units_text = Text( txt = units , font_size = drafting_specs.font_size , align = (Align.CENTER , Align.MIN) )
+        units_text.position = row4_col3_box.center() + (0,-drafting_specs.font_size,0)
 
-        projection = Pos(row4_col1_box.center()) * GDTHelpers.ThirdAngleProjection( feature_size = nominal_text_size*1.5 , line_width = 1 )
+        paper_label = Text( txt = "PAPER" , font_size = drafting_specs.font_size/1.5 , align = (Align.CENTER , Align.MIN) )
+        paper_label.position = row4_col4_box.center() + (0,drafting_specs.font_size/1.5,0)
+        paper_text = Text( txt = str(page_size).split(".")[-1] , font_size = drafting_specs.font_size , align = (Align.CENTER , Align.MIN) )
+        paper_text.position = row4_col4_box.center() + (0,-drafting_specs.font_size,0)
 
+        page_label = Text( txt = "PAGE" , font_size = drafting_specs.font_size/1.5 , align = (Align.CENTER , Align.MIN) )
+        page_label.position = row4_col5_box.center() + (0,drafting_specs.font_size/1.5,0)
+        page_text = Text( txt = str(sheet_number) + " / " + str(sheet_count) , font_size = drafting_specs.font_size , align = (Align.CENTER , Align.MIN) )
+        page_text.position = row4_col5_box.center() + (0,-drafting_specs.font_size,0)
 
-        text_frame = trace( text_frame_curve , line_width , mode = Mode.PRIVATE )
+        projection = Pos(row4_col1_box.center()) * GDTHelpers.ThirdAngleProjection( Draft( font_size = drafting_specs.font_size*1.5 , line_width = drafting_specs.line_width ) )
+
+        text_frame = trace( text_frame_curve , drafting_specs.line_width , mode = Mode.PRIVATE )
 
 
         technical_drawing = Compound(
@@ -269,6 +277,7 @@ class Drawing(BaseSketchObject):
               designed_label , designed_text , date_text,
               scale_label , scale_text,
               units_label , units_text ,
+              paper_label , paper_text,
               page_label , page_text,
               projection,
             ]
@@ -277,6 +286,63 @@ class Drawing(BaseSketchObject):
         super().__init__(obj=technical_drawing, rotation=0, align=None, mode=mode)
 
 if __name__ == "__main__":
-  from ocp_vscode import *
+    from ocp_vscode import *
+    from ProjectionHelpers import *
+    
+    scale_factor = 1
 
-  show( Drawing() , colors = ["#000"] )
+    a = Box( 1 , 1 , 1 ) + Pos( (0.5,0.5,0.5) ) * Sphere( radius = 0.2 )
+    view_origin = (1,0,0)
+    view_up = (0,0,1)
+    a_vis , a_hid = allOrthographicViews(
+        part = a,
+        front_viewport_origin= view_origin,
+        front_viewport_up = view_up,
+        scale_factor = 25.4/scale_factor
+    )
+
+    horizontal_offset = 3*IN
+    vertical_offset = 2.25*IN
+
+    page_origin = ( 0.5*IN , 0.75*IN )
+
+    show(
+        Drawing(
+            designed_by = "NATAN HERZOG",
+            project_name="BUILD123D DRAFTING HELPERS",
+            part_name = "TESTING DRAWING FORMAT",
+            drawing_number = "TST-1",
+            drawing_scale = scale_factor,
+            sheet_number = 3,
+            sheet_count = 10,
+            page_size = PageSize.A3,
+            drafting_specs = Draft( font_size = 7 , line_width = 0.1 )
+        ) ,
+        Compound([
+      Pos( page_origin ) * Compound( a_hid["front"] ),
+      Pos( page_origin ) * Pos( X = horizontal_offset ) * Compound( a_hid["right"] ),
+      Pos( page_origin ) * Pos( X = -horizontal_offset ) * Compound( a_hid["left"] ),
+      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_hid["back"] ),
+      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_hid["back"] ),
+      Pos( page_origin ) * Pos( Y = vertical_offset ) * Compound( a_hid["top"] ),
+      Pos( page_origin ) * Pos( Y = -vertical_offset ) * Compound( a_hid["bottom"] ),
+      Pos( page_origin ) * Pos( X = -horizontal_offset , Y = vertical_offset ) * Compound( a_hid["iso 1"] ),
+      Pos( page_origin ) * Pos( X = horizontal_offset , Y = vertical_offset ) * Compound( a_hid["iso 2"] ),
+      Pos( page_origin ) * Pos( X = horizontal_offset , Y = -vertical_offset ) * Compound( a_hid["iso 3"] ),
+      Pos( page_origin ) * Pos( X = -horizontal_offset, Y = -vertical_offset ) * Compound( a_hid["iso 4"] ),
+    ]),
+    Compound([
+      Pos( page_origin ) * Compound( a_vis["front"] ),
+      Pos( page_origin ) * Pos( X = horizontal_offset ) * Compound( a_vis["right"] ),
+      Pos( page_origin ) * Pos( X = -horizontal_offset ) * Compound( a_vis["left"] ),
+      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_vis["back"] ),
+      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_vis["back"] ),
+      Pos( page_origin ) * Pos( Y = vertical_offset ) * Compound( a_vis["top"] ),
+      Pos( page_origin ) * Pos( Y = -vertical_offset ) * Compound( a_vis["bottom"] ),
+      Pos( page_origin ) * Pos( X = -horizontal_offset , Y = vertical_offset ) * Compound( a_vis["iso 1"] ),
+      Pos( page_origin ) * Pos( X = horizontal_offset , Y = vertical_offset ) * Compound( a_vis["iso 2"] ),
+      Pos( page_origin ) * Pos( X = horizontal_offset , Y = -vertical_offset ) * Compound( a_vis["iso 3"] ),
+      Pos( page_origin ) * Pos( X = -horizontal_offset , Y = -vertical_offset ) * Compound( a_vis["iso 4"] ),
+    ]),
+        colors = ["#000","#CCC","#000"]
+    )
