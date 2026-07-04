@@ -298,11 +298,11 @@ if __name__ == "__main__":
         part = a,
         front_viewport_origin= view_origin,
         front_viewport_up = view_up,
+        horizontal_offset=3*IN,
+        vertical_offset=2.25*IN,
+        positions=None,
         scale_factor = 25.4/scale_factor
     )
-
-    horizontal_offset = 3*IN
-    vertical_offset = 2.25*IN
 
     page_origin = ( 0.5*IN , 0.75*IN )
 
@@ -319,30 +319,23 @@ if __name__ == "__main__":
             drafting_specs = Draft( font_size = 7 , line_width = 0.1 )
         ) ,
         Compound([
-      Pos( page_origin ) * Compound( a_hid["front"] ),
-      Pos( page_origin ) * Pos( X = horizontal_offset ) * Compound( a_hid["right"] ),
-      Pos( page_origin ) * Pos( X = -horizontal_offset ) * Compound( a_hid["left"] ),
-      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_hid["back"] ),
-      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_hid["back"] ),
-      Pos( page_origin ) * Pos( Y = vertical_offset ) * Compound( a_hid["top"] ),
-      Pos( page_origin ) * Pos( Y = -vertical_offset ) * Compound( a_hid["bottom"] ),
-      Pos( page_origin ) * Pos( X = -horizontal_offset , Y = vertical_offset ) * Compound( a_hid["iso 1"] ),
-      Pos( page_origin ) * Pos( X = horizontal_offset , Y = vertical_offset ) * Compound( a_hid["iso 2"] ),
-      Pos( page_origin ) * Pos( X = horizontal_offset , Y = -vertical_offset ) * Compound( a_hid["iso 3"] ),
-      Pos( page_origin ) * Pos( X = -horizontal_offset, Y = -vertical_offset ) * Compound( a_hid["iso 4"] ),
-    ]),
-    Compound([
-      Pos( page_origin ) * Compound( a_vis["front"] ),
-      Pos( page_origin ) * Pos( X = horizontal_offset ) * Compound( a_vis["right"] ),
-      Pos( page_origin ) * Pos( X = -horizontal_offset ) * Compound( a_vis["left"] ),
-      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_vis["back"] ),
-      Pos( page_origin ) * Pos( X = -2*horizontal_offset ) * Compound( a_vis["back"] ),
-      Pos( page_origin ) * Pos( Y = vertical_offset ) * Compound( a_vis["top"] ),
-      Pos( page_origin ) * Pos( Y = -vertical_offset ) * Compound( a_vis["bottom"] ),
-      Pos( page_origin ) * Pos( X = -horizontal_offset , Y = vertical_offset ) * Compound( a_vis["iso 1"] ),
-      Pos( page_origin ) * Pos( X = horizontal_offset , Y = vertical_offset ) * Compound( a_vis["iso 2"] ),
-      Pos( page_origin ) * Pos( X = horizontal_offset , Y = -vertical_offset ) * Compound( a_vis["iso 3"] ),
-      Pos( page_origin ) * Pos( X = -horizontal_offset , Y = -vertical_offset ) * Compound( a_vis["iso 4"] ),
-    ]),
+            Pos( page_origin ) * Compound( a_hid["front"] ),
+            Pos( page_origin ) * Compound( a_hid["right"] ),
+            Pos( page_origin ) * Compound( a_hid["left"] ),
+            Pos( page_origin ) * Compound( a_hid["back"] ),
+            Pos( page_origin ) * Compound( a_hid["back"] ),
+            Pos( page_origin ) * Compound( a_hid["top"] ),
+            Pos( page_origin ) * Compound( a_hid["bottom"] ),
+        ]),
+        Compound([
+            Pos( page_origin ) * Compound( a_vis["front"] ),
+            Pos( page_origin ) * Compound( a_vis["right"] ),
+            Pos( page_origin ) * Compound( a_vis["left"] ),
+            Pos( page_origin ) * Compound( a_vis["back"] ),
+            Pos( page_origin ) * Compound( a_vis["back"] ),
+            Pos( page_origin ) * Compound( a_vis["top"] ),
+            Pos( page_origin ) * Compound( a_vis["bottom"] ),
+        ]),
+        a,
         colors = ["#000","#CCC","#000"]
     )

@@ -28,8 +28,21 @@ def allOrthographicViews(
   part: Part ,
   front_viewport_origin : VectorLike ,
   front_viewport_up : VectorLike ,
+  horizontal_offset : float ,
+  vertical_offset : float ,
+  positions : {str : VectorLike} ,
   scale_factor : float = 1.0 ,
 ) -> tuple[ ShapeList[ Edge ] , ShapeList[ Edge ] ]:
+
+  if positions == None:
+    positions = {
+      "front" : (0,0) ,
+      "right" : ( horizontal_offset , 0 ),
+      "left"  : (-horizontal_offset , 0 ),
+      "back"  : (-2*horizontal_offset , 0 ),
+      "top"   : ( 0 , vertical_offset ),
+      "bottom": ( 0 ,-vertical_offset )
+    }
   
   scaled_part = part if scale_factor == 1.0 else scale( part , scale_factor )
 
@@ -125,36 +138,36 @@ def allOrthographicViews(
   )
 
   visible = {
-    "front" : front_visible,
-    "right" : right_visible,
-    "left" : left_visible,
-    "back" : back_visible,
-    "top" : top_visible,
-    "bottom" : bottom_visible,
-    "iso 1" : iso_1_visible,
-    "iso 2" : iso_2_visible,
-    "iso 3" : iso_3_visible,
-    "iso 4" : iso_4_visible,
-    "iso 5" : iso_5_visible,
-    "iso 6" : iso_6_visible,
-    "iso 7" : iso_7_visible,
-    "iso 8" : iso_8_visible,
+    "front"   : Pos( positions["front"] )   * Compound( front_visible ),
+    "right"   : Pos( positions["right"] )   * Compound( right_visible ),
+    "left"    : Pos( positions["left"] )    * Compound( left_visible ),
+    "back"    : Pos( positions["back"] )    * Compound( back_visible ),
+    "top"     : Pos( positions["top"] )     * Compound( top_visible ),
+    "bottom"  : Pos( positions["bottom"] )  * Compound( bottom_visible ),
+    "iso 1"   : Compound( iso_1_visible ),
+    "iso 2"   : Compound( iso_2_visible ),
+    "iso 3"   : Compound( iso_3_visible ),
+    "iso 4"   : Compound( iso_4_visible ),
+    "iso 5"   : Compound( iso_5_visible ),
+    "iso 6"   : Compound( iso_6_visible ),
+    "iso 7"   : Compound( iso_7_visible ),
+    "iso 8"   : Compound( iso_8_visible ),
   }
   hidden = {
-    "front" : front_hidden,
-    "right" : right_hidden,
-    "left" : left_hidden,
-    "back" : back_hidden,
-    "top" : top_hidden,
-    "bottom" : bottom_hidden,
-    "iso 1" : iso_1_hidden,
-    "iso 2" : iso_2_hidden,
-    "iso 3" : iso_3_hidden,
-    "iso 4" : iso_4_hidden,
-    "iso 5" : iso_5_hidden,
-    "iso 6" : iso_6_hidden,
-    "iso 7" : iso_7_hidden,
-    "iso 8" : iso_8_hidden,
+    "front"   : Pos( positions["front"] )   * Compound( front_hidden ),
+    "right"   : Pos( positions["right"] )   * Compound( right_hidden ),
+    "left"    : Pos( positions["left"] )    * Compound( left_hidden ),
+    "back"    : Pos( positions["back"] )    * Compound( back_hidden ),
+    "top"     : Pos( positions["top"] )     * Compound( top_hidden ),
+    "bottom"  : Pos( positions["bottom"] )  * Compound( bottom_hidden ),
+    "iso 1"   : Compound( iso_1_hidden ),
+    "iso 2"   : Compound( iso_2_hidden ),
+    "iso 3"   : Compound( iso_3_hidden ),
+    "iso 4"   : Compound( iso_4_hidden ),
+    "iso 5"   : Compound( iso_5_hidden ),
+    "iso 6"   : Compound( iso_6_hidden ),
+    "iso 7"   : Compound( iso_7_hidden ),
+    "iso 8"   : Compound( iso_8_hidden ),
   }
   return visible , hidden
 
@@ -179,6 +192,9 @@ if __name__ == "__main__":
     part = a,
     front_viewport_origin= view_origin,
     front_viewport_up = view_up,
+    horizontal_offset= 2 ,
+    vertical_offset= 2,
+    positions = None,
     scale_factor = 1.0
   )
 
@@ -186,29 +202,21 @@ if __name__ == "__main__":
     a ,
     Compound([
       Compound( a_hid_2["front"] ),
-      Pos( X = 2 ) * Compound( a_hid_2["right"] ),
-      Pos( X = -2 ) * Compound( a_hid_2["left"] ),
-      Pos( X = -4 ) * Compound( a_hid_2["back"] ),
-      Pos( X = -4 ) * Compound( a_hid_2["back"] ),
-      Pos( Y = 2 ) * Compound( a_hid_2["top"] ),
-      Pos( Y = -2 ) * Compound( a_hid_2["bottom"] ),
-      Pos( X = -2 , Y = 2 ) * Compound( a_hid_2["iso 1"] ),
-      Pos( X = 2 , Y = 2 ) * Compound( a_hid_2["iso 2"] ),
-      Pos( X = 2 , Y = -2 ) * Compound( a_hid_2["iso 3"] ),
-      Pos( X = -2 , Y = -2 ) * Compound( a_hid_2["iso 4"] ),
+      Compound( a_hid_2["right"] ),
+      Compound( a_hid_2["left"] ),
+      Compound( a_hid_2["back"] ),
+      Compound( a_hid_2["back"] ),
+      Compound( a_hid_2["top"] ),
+      Compound( a_hid_2["bottom"] ),
     ]),
     Compound([
       Compound( a_vis_2["front"] ),
-      Pos( X = 2 ) * Compound( a_vis_2["right"] ),
-      Pos( X = -2 ) * Compound( a_vis_2["left"] ),
-      Pos( X = -4 ) * Compound( a_vis_2["back"] ),
-      Pos( X = -4 ) * Compound( a_vis_2["back"] ),
-      Pos( Y = 2 ) * Compound( a_vis_2["top"] ),
-      Pos( Y = -2 ) * Compound( a_vis_2["bottom"] ),
-      Pos( X = -2 , Y = 2 ) * Compound( a_vis_2["iso 1"] ),
-      Pos( X = 2 , Y = 2 ) * Compound( a_vis_2["iso 2"] ),
-      Pos( X = 2 , Y = -2 ) * Compound( a_vis_2["iso 3"] ),
-      Pos( X = -2 , Y = -2 ) * Compound( a_vis_2["iso 4"] ),
+      Compound( a_vis_2["right"] ),
+      Compound( a_vis_2["left"] ),
+      Compound( a_vis_2["back"] ),
+      Compound( a_vis_2["back"] ),
+      Compound( a_vis_2["top"] ),
+      Compound( a_vis_2["bottom"] ),
     ]),
     colors = [
       "#CCC" , "#CCC" , "#000",
